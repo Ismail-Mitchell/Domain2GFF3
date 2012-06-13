@@ -1,102 +1,115 @@
 #!/usr/local/bin/perl
 
-#Creating holders for read in to allocate to Arrays
-my ($f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10, $f11, $f12, $f13);
-$f1 = $f2 = $f3 = $f4 = $f5 = $f6 = $f7 = $f8 = $f9 = $f11 = $f12 = $f13 = "";
+# $Date: 2012-06-13 $
+# $Revision: 1.0.0 $
+# $Source: /usr/local/Desktop/dictyProjects/​domain2gff3.pl $
 
-#Creating Arrays for Columns for 
-my @dictyID = (); #f1 Seq ID
-my @dbName  = (); #f4 Source or Database
-my @Start = ();   #f7
-my @End = ();     #f8
-my @Score = ();   #f9
-my @DomainN = (); #f6 Domain Name
-my @Alias = ();   #f5 Domain ID
-my @Note1 = ();   #f12 interprot ID
-my @Note2 = ();   #f13 interprot name
-my @Dbx = ();     #f2 CRC64
+use warnings;
+use strict;
+use Carp qw( croak );
+use English qw( -no_match_vars );
+
+our $VERSION = '1.0.0';
+
+#Creating holders for read in to allocate to Arrays
+my ( $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10, $f11, $f12, $f13 );
+$f1 = $f2 = $f3 = $f4 = $f5 = $f6 = $f7 = $f8 = $f9 = $f10 = $f11 = $f12 =
+  $f13 = q{};    #Setting to an empty string
+
+#Creating Arrays for Columns for
+my @DICTYID = ();    #f1 Seq ID
+my @DBNAME  = ();    #f4 Source or Database
+my @START   = ();    #f7
+my @END     = ();    #f8
+my @SCORE   = ();    #f9
+my @DOMAINN = ();    #f6 Domain Name
+my @ALIAS   = ();    #f5 Domain ID
+my @NOTE1   = ();    #f12 interprot ID
+my @NOTE2   = ();    #f13 interprot name
+my @DBX     = ();    #f2 CRC64
 
 #Opening DictyBase File for read in to arrays
-open DDFILE, "Dd_trial.txt" or die $!;
-while (<DDFILE>) {
-    ($f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10, $f11, $f12, $f13) = split("\t", $_);
-    
-    push(@dictyID, $f1);
-    push(@dbName, $f4);
-    push(@Start, $f7);
-    push(@End, $f8);
-    push(@Score, $f9);
-    push(@DomainN, $f6);
-    push(@Alias, $f5);
-    push(@Note1, $f12);
-    push(@Note2, $f13);
-    #push(@Dbx, $f2);
+open( my $in, '<', 'Dd_trial.txt' ) or croak "Can't open input.txt: $OS_ERROR";
+my @lines = <$in>;
+
+close $in or croak "$in: $OS_ERROR";
+
+for my $line (@lines) {
+    ( $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10, $f11, $f12, $f13 ) =
+    split(/\t/, $line)xms;
+
+    push( @DICTYID, $f1 );
+    push( @DBNAME,  $f4 );
+    push( @START,   $f7 );
+    push( @END,     $f8 );
+    push( @SCORE,   $f9 );
+    push( @DOMAINN, $f6 );
+    push( @ALIAS,   $f5 );
+    push( @NOTE1,   $f12 );
+    push( @NOTE2,   $f13 );
+
+    #push(@DBX, $f2);
 }
 
-close DDFILE;
-
 #Removing Headline of the Db_protein file from each array
-shift(@dictyID);
-shift(@dbName);
-shift(@Start);
-shift(@End);
-shift(@Score);
-shift(@DomainN);
-shift(@Alias);
-shift(@Note1);
-shift(@Note2);
+shift(@DICTYID);
+shift(@DBNAME);
+shift(@START);
+shift(@END);
+shift(@SCORE);
+shift(@DOMAINN);
+shift(@ALIAS);
+shift(@NOTE1);
+shift(@NOTE2);
 
 #Removing any Newline operations that may be in the front or the end of a line
-foreach(@dictyID, @dbName, @Note1, @Note2){
-    
+foreach ( @DICTYID, @DBNAME, @NOTE1, @NOTE2 ) {
+
     chomp $_;
 }
 
 #Replacing commas, semi colons for URL escaping conventions.
-foreach (@Note2, @Note1, @DomainN, @Alias) {
-  
-$_ =~ s/,/%2C/;
-$_ =~ s/;/%3B/;
-    
-} #End of Foreach
+foreach ( @NOTE2, @NOTE1, @DOMAINN, @ALIAS ) {
 
+    $_ =~ s/,/%2C/xms;
+    $_ =~ s/;/%3B/xms;
+
+}    #End of Foreach
 
 #Replacing Blank entries in score with a . to make it valid with gff3
-foreach (@Score){
-if(!$_){
+foreach (@SCORE) {
+    if ( !$_ ) {
 
-    $_ = ".";
+        $_ = q{.};
 
-}
-else
-{}
-    }#End of foreach of Score
-
-
-
-
+    }
+    else { }
+}    #End of foreach of Score
 
 #Opening a file to input the data into the gff3 format
-open (MYFILE, '>domain.txt') || die("This file will not open!");
+open( my $out, '>', 'domain.txt' ) or croak "Can't open output.txt: $OS_ERROR";
 
-print MYFILE "##gff-version 3\n";
+print {$out} "##gff-version 3\n";
 
-my $length = scalar(@dictyID);
-for (my $i = 0; $i < $length; $i++)
-{
+my $length = scalar(@DICTYID);
 
-    print MYFILE "$dictyID[$i]\t"; #Seq ID 
-    print MYFILE "$dbName[$i]\t"; # Source
-    print MYFILE "polypeptide\t"; # Type
-    print MYFILE "$Start[$i]\t"; # Start
-    print MYFILE "$End[$i]\t"; # End
-    print MYFILE "$Score[$i]\t"; # Score
-    print MYFILE ".\t"; # Strand
-    print MYFILE ".\t"; # Phase
-    print MYFILE "Name=$DomainN[$i];Alias=$Alias[$i];Note=InterPro ID:$Note1[$i] | InterPro Name:$Note2[$i]\n"; # Attributes
+my $i = 0;
+
+while ( $i < $length ) {
+
+    print {$out} "$DICTYID[$i]\t";    #Seq ID
+    print {$out} "$DBNAME[$i]\t";     # Source
+    print {$out} "polypeptide\t";     # Type
+    print {$out} "$START[$i]\t";      # Start
+    print {$out} "$END[$i]\t";        # End
+    print {$out} "$SCORE[$i]\t";      # Score
+    print {$out} ".\t";               # Strand
+    print {$out} ".\t";               # Phase
+    print {$out}
+"Name=$DOMAINN[$i];Alias=$ALIAS[$i];Note=InterPro ID:$NOTE1[$i] | InterPro Name:$NOTE2[$i]\n"
+      ;                               # Attributes
+    $i++;
 
 }
 
-close MYFILE;
-   
-
+close $out or croak "$in: $OS_ERROR";
