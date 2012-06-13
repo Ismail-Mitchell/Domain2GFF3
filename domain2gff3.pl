@@ -36,7 +36,7 @@ close $in or croak "$in: $OS_ERROR";
 
 for my $line (@lines) {
     ( $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10, $f11, $f12, $f13 ) =
-    split(/\t/, $line)xms;
+    split("\t", $line);
 
     push( @DICTYID, $f1 );
     push( @DBNAME,  $f4 );
