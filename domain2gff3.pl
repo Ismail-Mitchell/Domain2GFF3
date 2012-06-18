@@ -139,9 +139,9 @@ my $old_dicty = q{};
 push @DICTYID, q{Last One}
   ; #Adding one more element to the dictyid array for the ### if statement to work.
 
-push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
-push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
-push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
+push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work.
+push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work.
+push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work.
 
 while ( $i < $length ) {
 
