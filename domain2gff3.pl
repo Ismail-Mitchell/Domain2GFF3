@@ -8,6 +8,7 @@ use warnings;
 use strict;
 use Carp qw( croak );
 use English qw( -no_match_vars );
+use List::MoreUtils qw(uniq);
 
 our $VERSION = '1.0.0';
 
@@ -28,8 +29,12 @@ my @NOTE1   = ();    #f12 interprot ID
 my @NOTE2   = ();    #f13 interprot name
 my @DBX     = ();    #f2 CRC64
 
+print
+"Enter the name of the file after 'perl filename' if you have no information in domain.txt\n"
+  or croak "failed\n";
+
 #Opening DictyBase File for read in to arrays
-open my $in, '<', 'Dd_trial.txt' or croak "Can't open input.txt: $OS_ERROR";
+open my $in, '<', $ARGV[0] or croak "Can't open Protein Domain File: $OS_ERROR";
 my @lines = <$in>;
 
 close $in or croak "$in: $OS_ERROR";
@@ -88,7 +93,7 @@ foreach (@SCORE) {
 
 my $length = scalar @DICTYID;
 
-my @DICTYIDQ = uniq2(@DICTYID);
+my @DICTYIDQ = uniq(@DICTYID);
 
 my $length2 = scalar @DICTYIDQ;
 
@@ -128,6 +133,7 @@ print {$out} "##gff-version 3\n" or croak "failed\n";
 
 my $i         = 0;
 my $s         = 0;
+my $z         = 1;
 my $old_dicty = q{};
 
 push @DICTYID, q{Last One}
@@ -138,22 +144,23 @@ push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
 push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
 
 while ( $i < $length ) {
-    
+
     #IF statement for printing out Sequence Regions
     if ( $dictyseq[$s] eq $DICTYID[$i] && $DICTYID[$i] ne $old_dicty ) {
         print {$out}
-"##sequence-region\t$dictyseq[$s]\t$dictyseq[$s+1]\t$dictyseq[$s+2]\n" or croak "failed\n";
+          "##sequence-region\t$dictyseq[$s]\t$dictyseq[$s+1]\t$dictyseq[$s+2]\n"
+          or croak "failed\n";
 
-        my $old_dicty = $DICTYID[$i];
-        $s = $s + 3;
+        $old_dicty = $DICTYID[$i];
+        $s         = $s + $z + $z + $z;
     }
     else { }
-    
+
     #Prints out the lines for the sequences
     print {$out}
 "$DICTYID[$i]\t$DBNAME[$i]\tpolypeptide\t$START[$i]\t$END[$i]\t$SCORE[$i]\t.\t.\tName=$DOMAINN[$i];Alias=$ALIAS[$i];Note=InterPro ID:$NOTE1[$i] | InterPro Name:$NOTE2[$i]\n"
       or croak "failed\n";
-    
+
     #Prints out ### for end of sequence regions
     if ( $DICTYID[$i] ne $DICTYID[ $i + 1 ] ) {
         print {$out} "###\n" or croak "failed\n";
@@ -165,17 +172,4 @@ while ( $i < $length ) {
 }    #End of $i While
 
 close $out or croak "$in: $OS_ERROR";
-
-#Filters an array for only unique items.
-sub uniq2 {
-    my %seen = ();
-    my @r    = ();
-    foreach my $a (@_) {
-        unless ( $seen{$a} ) {
-            push @r, $a;
-            $seen{$a} = 1;
-        }
-    }
-    return @r;
-}
 
