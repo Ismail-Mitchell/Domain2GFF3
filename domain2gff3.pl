@@ -29,38 +29,38 @@ my @NOTE2   = ();    #f13 interprot name
 my @DBX     = ();    #f2 CRC64
 
 #Opening DictyBase File for read in to arrays
-open( my $in, '<', 'Dd_trial.txt' ) or croak "Can't open input.txt: $OS_ERROR";
+open my $in, '<', 'Dd_trial.txt' or croak "Can't open input.txt: $OS_ERROR";
 my @lines = <$in>;
 
 close $in or croak "$in: $OS_ERROR";
 
 for my $line (@lines) {
     ( $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10, $f11, $f12, $f13 ) =
-    split("\t", $line);
+      split /\t/xms, $line;
 
-    push( @DICTYID, $f1 );
-    push( @DBNAME,  $f4 );
-    push( @START,   $f7 );
-    push( @END,     $f8 );
-    push( @SCORE,   $f9 );
-    push( @DOMAINN, $f6 );
-    push( @ALIAS,   $f5 );
-    push( @NOTE1,   $f12 );
-    push( @NOTE2,   $f13 );
+    push @DICTYID, $f1;
+    push @DBNAME,  $f4;
+    push @START,   $f7;
+    push @END,     $f8;
+    push @SCORE,   $f9;
+    push @DOMAINN, $f6;
+    push @ALIAS,   $f5;
+    push @NOTE1,   $f12;
+    push @NOTE2,   $f13;
 
     #push(@DBX, $f2);
 }
 
 #Removing Headline of the Db_protein file from each array
-shift(@DICTYID);
-shift(@DBNAME);
-shift(@START);
-shift(@END);
-shift(@SCORE);
-shift(@DOMAINN);
-shift(@ALIAS);
-shift(@NOTE1);
-shift(@NOTE2);
+shift @DICTYID;
+shift @DBNAME;
+shift @START;
+shift @END;
+shift @SCORE;
+shift @DOMAINN;
+shift @ALIAS;
+shift @NOTE1;
+shift @NOTE2;
 
 #Removing any Newline operations that may be in the front or the end of a line
 foreach ( @DICTYID, @DBNAME, @NOTE1, @NOTE2 ) {
@@ -86,30 +86,96 @@ foreach (@SCORE) {
     else { }
 }    #End of foreach of Score
 
-#Opening a file to input the data into the gff3 format
-open( my $out, '>', 'domain.txt' ) or croak "Can't open output.txt: $OS_ERROR";
+my $length = scalar @DICTYID;
 
-print {$out} "##gff-version 3\n";
+my @DICTYIDQ = uniq2(@DICTYID);
 
-my $length = scalar(@DICTYID);
+my $length2 = scalar @DICTYIDQ;
 
-my $i = 0;
+my $c        = 0;
+my $d        = 0;
+my @startseq = ();
+my @dictyseq = ();
 
-while ( $i < $length ) {
+while ( $d < $length2 ) {
+    while ( $c < $length ) {
 
-    print {$out} "$DICTYID[$i]\t";    #Seq ID
-    print {$out} "$DBNAME[$i]\t";     # Source
-    print {$out} "polypeptide\t";     # Type
-    print {$out} "$START[$i]\t";      # Start
-    print {$out} "$END[$i]\t";        # End
-    print {$out} "$SCORE[$i]\t";      # Score
-    print {$out} ".\t";               # Strand
-    print {$out} ".\t";               # Phase
-    print {$out}
-"Name=$DOMAINN[$i];Alias=$ALIAS[$i];Note=InterPro ID:$NOTE1[$i] | InterPro Name:$NOTE2[$i]\n"
-      ;                               # Attributes
-    $i++;
+        if ( $DICTYIDQ[$d] eq $DICTYID[$c] ) {
+            push @startseq, $START[$c];
+            push @startseq, $END[$c];
 
+        }
+        else { }
+        $c++;
+
+    }    #End of while
+
+    push @dictyseq, $DICTYIDQ[$d];
+    @startseq = sort { $a <=> $b } @startseq;
+    push @dictyseq, $startseq[0];    #Small Number
+    @startseq = reverse @startseq;
+    push @dictyseq, $startseq[0];    #Max Number
+    @startseq = ();
+
+    $c = 0;
+    $d++;
 }
 
+#Opening a file to input the data into the gff3 format
+open my $out, '>', 'domain.txt' or croak "Can't open output.txt: $OS_ERROR";
+
+print {$out} "##gff-version 3\n" or croak "failed\n";
+
+my $i         = 0;
+my $s         = 0;
+my $old_dicty = q{};
+
+push @DICTYID, q{Last One}
+  ; #Adding one more element to the dictyid array for the ### if statement to work.
+
+push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
+push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
+push @dictyseq, $old_dicty;    #Adding to end of array for s+3 function to work
+
+while ( $i < $length ) {
+    
+    #IF statement for printing out Sequence Regions
+    if ( $dictyseq[$s] eq $DICTYID[$i] && $DICTYID[$i] ne $old_dicty ) {
+        print {$out}
+"##sequence-region\t$dictyseq[$s]\t$dictyseq[$s+1]\t$dictyseq[$s+2]\n" or croak "failed\n";
+
+        my $old_dicty = $DICTYID[$i];
+        $s = $s + 3;
+    }
+    else { }
+    
+    #Prints out the lines for the sequences
+    print {$out}
+"$DICTYID[$i]\t$DBNAME[$i]\tpolypeptide\t$START[$i]\t$END[$i]\t$SCORE[$i]\t.\t.\tName=$DOMAINN[$i];Alias=$ALIAS[$i];Note=InterPro ID:$NOTE1[$i] | InterPro Name:$NOTE2[$i]\n"
+      or croak "failed\n";
+    
+    #Prints out ### for end of sequence regions
+    if ( $DICTYID[$i] ne $DICTYID[ $i + 1 ] ) {
+        print {$out} "###\n" or croak "failed\n";
+    }
+    else { }
+
+    $i++;
+
+}    #End of $i While
+
 close $out or croak "$in: $OS_ERROR";
+
+#Filters an array for only unique items.
+sub uniq2 {
+    my %seen = ();
+    my @r    = ();
+    foreach my $a (@_) {
+        unless ( $seen{$a} ) {
+            push @r, $a;
+            $seen{$a} = 1;
+        }
+    }
+    return @r;
+}
+
