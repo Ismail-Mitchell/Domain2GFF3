@@ -18,6 +18,8 @@ our $VERSION = '1.0.0';
 my $fh = IO::File->new( 'Dd_trial.txt', 'r' )
 or croak "Can't open $ARGV[0] File: $!";
 
+my $fh2 = IO::File->new("> output.gff3") or croak "Couldn't open file for writing: $!\n";
+
 my $running_id;
 my $current_id;
 my $data;
@@ -49,7 +51,8 @@ while ( my $line = $fh->getline ) {
     
 }    #End of While
 
-
+$fh->close;
+$fh2->close;
 
 
 
@@ -111,7 +114,7 @@ sub write_gff3 {
     
     @start_end = sort { $a <=> $b } @start_end;
     
-    print "##sequence-region\t$name\t$start_end[0]\t$start_end[-1]\n".$outstr."###\n";
+    print {$fh2} "##sequence-region\t$name\t$start_end[0]\t$start_end[-1]\n".$outstr."###\n";
     
     
     
