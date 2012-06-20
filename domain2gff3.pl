@@ -6,24 +6,35 @@
 
 use warnings;
 use strict;
-use Carp qw( croak );
 use IO::File;
 use Bio::GFF3::LowLevel qw (gff3_format_feature);
 use Data::Dumper;
-
+use Getopt::Long;
 our $VERSION = '1.0.0';
+
+# setup defaults
+my $input_file  = 'Dd_trial.txt';
+my $output_file = 'output.gff3';
+
+GetOptions(
+'i|input=s'    => \$input_file,
+'o|output=s'     => \$output_file,
+) or die "Incorrect usage!\n";
+
+
 
 #Opening File with IO file handlers to read in a line at a time
 
-my $fh = IO::File->new( 'Dd_trial.txt', 'r' )
-or croak "Can't open $ARGV[0] File: $!";
+my $fh = IO::File->new( $input_file, 'r' )
+or die "Can't open $input_file File: $!";
 
-my $fh2 = IO::File->new("> output.gff3") or croak "Couldn't open file for writing: $!\n";
+my $fh2 = IO::File->new( $output_file, 'w') or die "Couldn't open file for writing: $!\n";
+
+$fh2->print ("##gff-version\t3\n");
 
 my $running_id;
 my $current_id;
 my $data;
-my $input;
 
 while ( my $line = $fh->getline ) {
     chomp($line);
@@ -36,7 +47,7 @@ while ( my $line = $fh->getline ) {
             push @$data, $line;
         }
         else {
-            write_gff3($data);
+            write_gff3($data, $fh2);
             undef $data;
             push @$data, $line;
         }
@@ -59,7 +70,7 @@ $fh2->close;
 sub write_gff3 {
     
     
-    my ($data)  = @_;
+    my ($data,$fh2)  = @_;
     
     my @start_end;
     my $outstr = q{};
@@ -114,7 +125,8 @@ sub write_gff3 {
     
     @start_end = sort { $a <=> $b } @start_end;
     
-    print {$fh2} "##sequence-region\t$name\t$start_end[0]\t$start_end[-1]\n".$outstr."###\n";
+    
+    $fh2->print ("##sequence-region\t$name\t$start_end[0]\t$start_end[-1]\n".$outstr."###\n");
     
     
     
