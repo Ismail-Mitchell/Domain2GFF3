@@ -58,6 +58,14 @@ sub write_gff3 {
     
     my ($data)  = @_;
     
+    my @start_end;
+    my $outstr = q{};
+    my $name;
+    my $running_id;
+    my $current_id;
+    my $domain;
+    my $i = 0;
+    
     foreach my $line(@$data)
     {
         my @parts;
@@ -72,12 +80,42 @@ sub write_gff3 {
         $gff->{score} = $parts[8];
         $gff->{strand} = ".";
         $gff->{phase} = undef;
-        $gff->{attributes}->{ID} = 0;
         $gff->{attributes}->{Alias} = $parts[4];
 
-        print gff3_format_feature($gff);
+        $current_id = $parts[3];
+        
+        if ( $running_id ) {
+            if ( $current_id eq $running_id ) {
+                $gff->{attributes}->{ID} = $i;
+
+            }
+            else {
+                $i++;
+                $gff->{attributes}->{ID} = $i;
+                            }
+            
+        }    #End of Run/Current IF
+        else {
+            $gff->{attributes}->{ID} = $i;
+        }
         
         
+        $running_id = $current_id;
+        
+
+        push @start_end, $parts[6], $parts[7];
+        $outstr = gff3_format_feature($gff).$outstr;
+        $name = $parts[0];
     }
+    
+    
+    @start_end = sort { $a <=> $b } @start_end;
+    
+    print "##sequence-region\t$name\t$start_end[0]\t$start_end[-1]\n".$outstr."###\n";
+    
+    
+    
+    
+    
     
 }
