@@ -142,3 +142,76 @@ sub write_gff3
           . "###\n" );
 
 }
+
+=head1 NAME
+ 
+B<domain2gff3.pl> - [Converts InterPro Download File into GFF3 Format]
+
+=head1 SYNOPSIS
+
+perl domain2gff3.pl -i input_file.txt -o output_file.gff3
+
+=head1 REQUIRED ARGUMENTS
+
+B<[-i|-input]> - Takes a InterPro Protein Download File.
+
+=head1 OPTIONS
+
+B<[-o|-output]> - Changes the ouput file name from output.gff3 to the name it is assigned.
+
+=head1 DESCRIPTION
+
+InterPro domains of Dictyostelium proteins data is converted into a compliant GFF3 file.  The InterPro domains of Dictyostelium proteins 
+data is tab delimited with 13 columns arranged as follows: 
+ 
+'dictyBase ID	CRC64	Length	Database	Domain ID	Domain Name	Start	End	Score	Status	Date	InterPro ID	InterPro Name'.  
+ 
+ This data sequence is parsed and formatted into GFF3 format.
+
+=head1 DIAGNOSTICS
+
+Warnings that can occur with this module are the following:
+ 
+=over
+
+=item *
+ 
+If words are in the columns for B<start> and B<end>, the module will warn that words do not work with the sort function.
+ 
+=item *
+ 
+If there is no input file, the module will try to run Dd_trial.txt as an input file in the current working directory.
+
+=item *
+
+If a file is loaded that does not follow the data sequence mentioned in the DESCRIPTION, the module will pull the wrong values and error. 
+ 
+=back
+ 
+=head1 CONFIGURATION AND ENVIRONMENT
+ 
+ None.
+
+=head1 DEPENDENCIES
+ 
+Bio::GFF3::LowLevel
+
+=head1 INCOMPATIBILITIES
+
+None.
+
+=head1 BUGS AND LIMITATIONS
+
+Only works with the InterPro domains of Dictyostelium proteins tab delimited file found on dictyBase website.
+
+=head1 AUTHOR
+ 
+I<Isma'il Mitchell> B<[Mitchell.Ismail@gmail.com]> &
+I<Siddhartha Basu>  B<siddhartha-basu@northwestern.edu>
+ 
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) B<2012>, Northwestern University. All rights reserved.
+ 
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
+
