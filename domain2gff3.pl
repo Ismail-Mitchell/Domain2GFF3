@@ -30,11 +30,7 @@ our $VERSION = '1.0.0';
         my $data;
         my $self = shift;
         
-        #Creating Options using Get Long    
-        GetOptions(
-        'i|input=s'  => \$self->input,
-        'o|output=s' => \$self->output,
-        ) or die "Incorrect usage!\n";
+
     
         #Opening File with IO file handlers to read in a line at a time
         
@@ -59,10 +55,11 @@ our $VERSION = '1.0.0';
                 if ( $current_id eq $running_id )
                 {
                     push @$data, $line;
+                                        
                 }
                 else
                 {
-                    write_gff3( $data, $fh2 );
+                    $self->write_gff3( $data, $fh2 );
                     undef $data;
                     push @$data, $line;
                 }
@@ -76,6 +73,8 @@ our $VERSION = '1.0.0';
             $running_id = $current_id;
             
         }    #End of While
+        
+        $self->write_gff3( $data, $fh2 );
     
         $fh->close;
         $fh2->close;    
@@ -87,8 +86,7 @@ our $VERSION = '1.0.0';
 
 sub write_gff3
 {
-
-    my ( $data, $fh2 ) = @_;
+    my ( $self, $data, $fh2 ) = @_;
 
     my @start_end;
     my $outstr = q{};
@@ -160,13 +158,21 @@ sub write_gff3
 
 }
 }#End of Package
+my $input = 'Dd_trial.txt';
+my $output = 'output.txt';
+
+#Creating Options using Get Long    
+GetOptions(
+'i|input=s'  => \$input,
+'o|output=s' => \$output,
+) or die "Incorrect usage!\n";
+
 
 #Creating New Class
-my $me = d2gff->new({input => 'Dd_trial.txt', output => 'output.txt'});
+my $me = d2gff->new({input => $input , output => $output });
 
 #Processes the file for the output
 $me->process_file;
-
 
 =head1 NAME
  
