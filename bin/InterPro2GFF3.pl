@@ -2,8 +2,6 @@ use strict;
 use InterPro2GFF3;
 use Getopt::Long;
 
-BEGIN { use_ok 'InterPro2GFF3' }
-
 
 my $input = 'Dd_trial.txt';
 my $output = 'Output.gff3';
