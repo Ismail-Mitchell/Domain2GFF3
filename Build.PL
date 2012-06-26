@@ -29,8 +29,10 @@ my %module_build_args = (
 'recommends' => {},
 'recursive_test_files' => 1,
 'requires' => {
-    'CHI' => '0.36',
-    'File::Path' => '2.08'},
+    'Bio::GFF3::LowLevel' => '1.3',
+    'IO::File' => '1.3',
+    'Class::Accessor' => '0.34'    
+},
 'script_files' => []
 );
 
