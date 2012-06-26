@@ -191,7 +191,7 @@ sub write_gff3
 
 }
 
-
+1;
 
 =head1 NAME
  
