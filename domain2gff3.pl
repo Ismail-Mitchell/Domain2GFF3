@@ -14,23 +14,26 @@ use Bio::GFF3::LowLevel qw (gff3_format_feature);
 use Data::Dumper;
 use Getopt::Long;
 use Class::Accessor 'antlers';
+use Test::More tests => 15;
 
-our $VERSION = '1.0.0';
+use_ok( 'Bio::GFF3::LowLevel');
+use_ok( 'Class::Accessor');
+use_ok( 'IO::File');
+
+
+    our $VERSION = '1.0.0';
 
     has input => (is => 'ro', isa => "Str");
     has output => (is => 'ro', isa => "Str");
     
-    
-    
+
     sub process_file{
-        
         
         my $running_id;
         my $current_id;
         my $data;
         my $self = shift;
         
-
     
         #Opening File with IO file handlers to read in a line at a time
         
@@ -42,6 +45,10 @@ our $VERSION = '1.0.0';
         
         $fh2->print("##gff-version\t3\n");
         
+        ok($fh ne '', 'File Handler is not empty');
+        ok($fh2 ne '', 'Output File Hanlder is not empty');
+        isa_ok( $fh, 'IO::File', 'Checking File Handlers Input');
+
         
         while ( my $line = $fh->getline )
         {
@@ -72,12 +79,17 @@ our $VERSION = '1.0.0';
             
             $running_id = $current_id;
             
+            
+            
         }    #End of While
         
         $self->write_gff3( $data, $fh2 );
     
         $fh->close;
         $fh2->close;    
+        
+        
+
     
     } #End of Read File Sub
 
@@ -86,8 +98,12 @@ our $VERSION = '1.0.0';
 
 sub write_gff3
 {
-    my ( $self, $data, $fh2 ) = @_;
+    my ( $self, $data, $fh2 ) = @_;    
+    
+    isa_ok( $data, 'ARRAY', 'Checking data reference array');
+    isa_ok( $fh2, 'IO::File', 'Checking File Handlers Output');
 
+    
     my @start_end;
     my $outstr = q{};
     my $name;
@@ -166,6 +182,7 @@ GetOptions(
 'i|input=s'  => \$input,
 'o|output=s' => \$output,
 ) or die "Incorrect usage!\n";
+
 
 
 #Creating New Class
