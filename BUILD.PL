@@ -5,15 +5,17 @@ use Module::Build 0.3601;
 
 
 my %module_build_args = (
-'build_requires' => {
+'requires_argument' => {
     'Module::Build' => '0.3601',
     'Bio::GFF3::LowLevel' => '1.3',
     'IO::File' => '1.3',
     'Class::Accessor' => '0.34'
 },
 'configure_requires' => {
-    'Module::Build' => '0.3601'
-    
+    'Module::Build' => '0.3601',
+    'Bio::GFF3::LowLevel' => '1.3',
+    'IO::File' => '1.3',
+    'Class::Accessor' => '0.34'    
     
 },
 'dist_abstract' => 'Converts InterPro File to GFF3',

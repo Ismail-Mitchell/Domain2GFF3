@@ -12,7 +12,6 @@ use strict;
 use IO::File;
 use Bio::GFF3::LowLevel qw (gff3_format_feature);
 use Class::Accessor 'antlers';
-use Test::More tests => 15;
 
 
     our $VERSION = '1.0.0';
