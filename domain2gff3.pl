@@ -120,13 +120,27 @@ sub write_gff3
 
         $gff->{seq_id}              = $parts[0];
         $gff->{source}              = $parts[3];
-        $gff->{type}                = $parts[5];
-        $gff->{start}               = $parts[6];
+        $gff->{type}                = 'polypeptide';
         $gff->{end}                 = $parts[7];
         $gff->{strand}              = ".";
         $gff->{phase}               = undef;
         $gff->{attributes}->{Alias} = $parts[4];
 
+        
+        
+        if($parts[6] == 0)
+        {
+            $gff->{start}               = 1;
+        }
+        else
+        {
+            $gff->{start}               = $parts[6];
+        }
+        
+        
+        
+        
+        
         if ( !$parts[8] )
         {
 
@@ -167,6 +181,13 @@ sub write_gff3
     }
 
     @start_end = sort { $a <=> $b } @start_end;
+    
+    if($start_end[0] == 0)
+    {
+        $start_end[0] = 1 }
+    else
+    {}
+
 
     $fh2->print( "##sequence-region $name $start_end[0] $start_end[-1]\n" 
           . $outstr
