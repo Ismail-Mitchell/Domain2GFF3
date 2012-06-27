@@ -38,10 +38,6 @@ use Class::Accessor 'antlers';
         
         $fh2->print("##gff-version\t3\n");
         
-        ok($fh ne '', 'File Handler is not empty');
-        ok($fh2 ne '', 'Output File Hanlder is not empty');
-        isa_ok( $fh, 'IO::File', 'Checking File Handlers Input');
-
         
         while ( my $line = $fh->getline )
         {
@@ -93,9 +89,6 @@ sub write_gff3
 {
     my ( $self, $data, $fh2 ) = @_;    
     
-    isa_ok( $data, 'ARRAY', 'Checking data reference array');
-    isa_ok( $fh2, 'IO::File', 'Checking File Handlers Output');
-
     
     my @start_end;
     my $outstr = q{};
