@@ -23,23 +23,20 @@ my $s_line1 = "DDB0184107	D79C83DA61B22B0D	774	PANTHER	PTHR19446	FAMILY NOT NAME
 my $data2;
 push @$data2, $s_line1;
 my $self;
-InterPro2GFF3::write_gff3($self, $data2, $filehand );
+
+my $me2 = InterPro2GFF3->new();
+$me2->write_gff3($data2,$filehand);
+
 $filehand->close;
 
-open( FH, 'WriteGFF_test.txt' ) or die "Can't open File: $!";
-my @text = <FH>;
+#Opening File to Read the Wrtie_GFF3 subroutine
+my $filehand2 = IO::File->new( 'WriteGFF_test.txt', 'r' ) or die "Can't open File: $!";
+my @text = <$filehand2>;
 
-if($text[0] =~ m/sequence-region/)
-{
-    ok(1==1, 'Write-GFF3 works');
-}
+like($text[0], qr/sequence-region/, 'Write-GFF3 works');
+$filehand2->close;
 
-else{
-    ok(2==1, 'Write-GFF3 works');
-    
-}
 
-close FH;
 
 $me->process_file;
 
@@ -47,18 +44,10 @@ $me->process_file;
 
 is(-e $output,1,'File Export Exists');
 
-open( FH2, $output ) or die "Can't open File: $!";
-my @text2 = <FH2>;
+#Checking to see if there is something in the output for the file the process_file creates
+my $filehand3 = IO::File->new( $output, 'r' ) or die "Can't open File: $!";
+my @text2 = <$filehand3>;
+my $text_final = join('',@text2);
 
-
-if($text[0] =~ m/DDB0184107/)
-{
-    ok(1==1, 'Is there something in the output for process_file');
-}
-
-else{
-    ok(2==1, 'Is there something in the output for process_file');
-    
-}
-
-close FH2;
+like($text_final, qr/DDB0184107/, 'Is there something in the output for process_file');
+$filehand3->close;
