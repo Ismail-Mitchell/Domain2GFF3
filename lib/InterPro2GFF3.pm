@@ -12,6 +12,7 @@ use strict;
 use IO::File;
 use Bio::GFF3::LowLevel qw (gff3_format_feature);
 use Class::Accessor 'antlers';
+use String::Random;
 
 
     our $VERSION = '1.0.0';
@@ -87,7 +88,7 @@ use Class::Accessor 'antlers';
 
 sub write_gff3
 {
-    my ( $self, $data, $fh2 ) = @_;    
+    my ( $self, $data, $fh2) = @_;    
     
     
     my @start_end;
@@ -145,19 +146,19 @@ sub write_gff3
         {
             if ( $current_id eq $running_id )
             {
-                $gff->{attributes}->{ID} = $i;
+                $gff->{attributes}->{ID} = $parts[0].".".$i;
 
             }
             else
             {
                 $i++;
-                $gff->{attributes}->{ID} = $i;
+                $gff->{attributes}->{ID} = $parts[0].".".$i;
             }
 
         }    #End of Run/Current IF
         else
         {
-            $gff->{attributes}->{ID} = $i;
+            $gff->{attributes}->{ID} = $parts[0].".".$i;
         }
 
         $running_id = $current_id;
@@ -167,7 +168,8 @@ sub write_gff3
         push @start_end, $parts[6], $parts[7];
         $outstr .= gff3_format_feature($gff);
         $name = $parts[0];
-    }
+    } # END OF For Each Loop
+    
 
     @start_end = sort { $a <=> $b } @start_end;
     
@@ -181,6 +183,7 @@ sub write_gff3
     $fh2->print( "##sequence-region $name $start_end[0] $start_end[-1]\n" 
           . $outstr
           . "###\n" );
+    
 
 }
 
