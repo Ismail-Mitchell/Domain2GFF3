@@ -1,8 +1,8 @@
--Used Class:Accessor instead go Moose
+-Used Class:Accessor instead of Moose
 -Module assigns a '.' to score attribute in gff3 sequence if there is no score
 -Module changes 0 to 1 if a sequence in the loading file start with 0
 -Description of module is older than the one found in dictyBase forked repo.
 -Has an input function and an output function attached to line commands
 -interpro2gff3 script is packaged into a module InterPro2GFF3
 -InterPro2GFF3.pl in the bin folder take GetOptions for input and output
-- Bin perl script also calls the module and uses the module to process the file.
+-Bin perl script also calls the module and uses the module to process the file.
