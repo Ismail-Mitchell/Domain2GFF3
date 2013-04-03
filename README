@@ -1,18 +1,19 @@
-=pod
-
-=head1 NAME
+NAME
 
 DOMAIN2GFF3 - Convert InterPro flat file into a gff3 formatted file 
 
-=head1 VERSION
+
+VERSION
 
 version 1.0
 
-=head1 AUTHOR
+
+AUTHOR
 
 Ismail Mitchell <Mitchell.Ismail@gmail.com>
 
-=head1 COPYRIGHT AND LICENSE
+
+COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2012 by Ismail Mitchell for Northwestern Bioinformatics Group.
 
