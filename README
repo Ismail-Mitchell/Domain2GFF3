@@ -1,12 +1,10 @@
-This is Perl module [% module %].
+This is Perl module [% DOMAIN2GFF3 %].
 
 INSTALLATION
 
-[% module %] installation is straightforward. If your CPAN shell is set up,
-you should just be able to do
+[% DOMAIN2GFF3 %] installation is straightforward.  This module is not on CPAN.
 
-    % cpan [% module %]
-
+   
 Download it, unpack it, then build it as per the usual:
 
     % perl Makefile.PL
@@ -18,10 +16,10 @@ Then install it:
 
 DOCUMENTATION
 
-[% module %] documentation is available as in POD. So you can do:
+[% DOMAIN2GFF3 %] documentation is available as in POD. So you can do:
 
     % perldoc [% module %]
 
 to read the documentation online with your favorite pager.
 
-[% config.author %]
+Created by Ismail Mitchell for Northwestern Bioinformatics Group
